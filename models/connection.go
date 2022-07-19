@@ -1,53 +1,29 @@
 package models
 
 import (
-	"fmt"
-	"log"
-	"os"
-
+	_ "github.com/lib/pq"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-
-	"github.com/joho/godotenv"
 )
 
-var db *gorm.DB
-
-type DB struct {
-	*gorm.DB
+type Blog struct {
+	ID      uint    `gorm:"primary key:autoIncrement" json:"id"`
+	Author  *string `json:"author"`
+	Title   *string `json:"title"`
+	Content *string `json:"content"`
 }
 
-func Init() *gorm.DB {
-	// postgres db connection
-	err1 := godotenv.Load(".env")
-	if err1 != nil {
-		log.Fatalf("Error loading .env file")
-	}
-	user := goDotEnvVariable("USER")
-	dbname := goDotEnvVariable("DBNAME")
-	password := goDotEnvVariable("PASSWORD")
-	host := goDotEnvVariable("HOST")
-	port := goDotEnvVariable("PORT")
+var DB *gorm.DB
 
-	var err error
-	connStr := fmt.Sprintf("user=%s dbname=%s password=%s host=%s port=%s sslmode=disable", user, dbname, password, host, port)
-	db, err = gorm.Open(postgres.Open(connStr), &gorm.DB{})
-
-	checkErr(err)
-
-	err = db.Ping()
-	checkErr(err)
-
-	return db
-}
-
-func goDotEnvVariable(key string) string {
-	return os.Getenv(key)
-}
-
-// error handling
-func checkErr(err error) {
+func ConnectDatabase() {
+	db, err := gorm.Open(postgres.New(postgres.Config{
+		DSN: "host=localhost user=postgres dbname=blogApp password=admin sslmode=disable",
+	}))
 	if err != nil {
-		panic(err)
+		panic("Error:Failed to connect to database!")
 	}
+
+	db.AutoMigrate(&Blog{})
+
+	DB = db
 }

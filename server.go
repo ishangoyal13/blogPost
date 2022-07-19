@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 
-	"github.com/ishangoyal/blogPost/routers"
+	"github.com/ishangoyal13/blogPost/models"
+	"github.com/ishangoyal13/blogPost/routers"
 )
 
 func main() {
 	router := routers.RegisterRoutes()
+	models.ConnectDatabase()
 
 	fmt.Printf("\nSuccessfully connected to database :)\n\n")
 

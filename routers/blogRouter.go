@@ -4,39 +4,37 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	//"gitlab.com/ishangoyal/goapi/models"
+	"github.com/ishangoyal13/blogPost/models"
 	//jwtAuth "gitlab.com/ishangoyal/goapi/services"
 )
 
-type todo struct {
-	ID          string `json:"id"`
-	Task        string `json:"task"`
-	Description string `json:"description"`
+type CreateTaskInput struct {
+	ID      uint   `gorm:"primary key:autoIncrement" json:"id"`
+	Author  string `json:"author"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
 }
 
 func RegisterRoutes() *gin.Engine {
 	router := gin.Default()
 
 	// routes
-	router.GET("/task", GetTasks)
+	router.GET("/blog", GetTasks)
 	//router.GET("/task/:id", GetTaskById)
-	router.POST("/task", PostTasks)
-	router.POST("/signup", jwtAuth.SignUp)
-	router.DELETE("/task/:id", DeleteTask)
-	router.PUT("/task/:id", UpdateTask)
+	router.POST("/blog", PostTasks)
+	// router.POST("/signup", jwtAuth.SignUp)
+	router.DELETE("/blog/:id", DeleteTask)
+	//router.PUT("/task/:id", UpdateTask)
 
 	return router
 }
 
-var DB = models.Init()
-
 // get all tasks
 func GetTasks(c *gin.Context) {
-	var allTask []todo
-	out, err := DB.Query(`SELECT * from tasks`)
-	checkErr(err)
+	var allBlog []models.Blog
+	models.DB.Find(&allBlog)
 
-	for out.Next() {
+	/*for out.Next() {
 		var id string
 		var task string
 		var description string
@@ -45,9 +43,39 @@ func GetTasks(c *gin.Context) {
 
 		allTask = append(allTask, todo{ID: id, Task: task, Description: description})
 
-	}
-	c.IndentedJSON(http.StatusOK, allTask)
+	}*/
+	c.IndentedJSON(http.StatusOK, gin.H{"data": allBlog})
 }
+
+// post a new task
+func PostTasks(c *gin.Context) {
+	var newtodo CreateTaskInput
+
+	if err := c.ShouldBindJSON(&newtodo); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	tod := models.Blog{Author: &newtodo.Author, Title: &newtodo.Title, Content: &newtodo.Content}
+	models.DB.Create(&tod)
+	c.IndentedJSON(http.StatusCreated, gin.H{"data": tod})
+}
+
+// delete a task
+func DeleteTask(c *gin.Context) {
+	var delTodo models.Blog
+	if err := models.DB.Where("id = ?", c.Param("id")).First(&delTodo).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
+		return
+	}
+
+	models.DB.Delete(&delTodo)
+
+	c.JSON(http.StatusOK, gin.H{"data": true})
+
+}
+
+// extra code
 
 // get task by id
 /*
@@ -71,21 +99,8 @@ func GetTaskById(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, allTask)
 }*/
 
-// post a new task
-func PostTasks(c *gin.Context) {
-	var newtodo todo
-
-	if err := c.BindJSON(&newtodo); err != nil {
-		return
-	}
-
-	sqlStmnt := `INSERT INTO tasks (id,task,description) VALUES ($1,$2,$3)`
-	_, err := DB.Exec(sqlStmnt, newtodo.ID, newtodo.Task, newtodo.Description)
-	checkErr(err)
-	c.IndentedJSON(http.StatusCreated, newtodo)
-}
-
 // update a task
+/*
 func UpdateTask(c *gin.Context) {
 	id := c.Param("id")
 	var update todo
@@ -98,20 +113,4 @@ func UpdateTask(c *gin.Context) {
 	_, err := DB.Exec(sqlStmnt, update.Task, update.Description, id)
 	checkErr(err)
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "updated successfully"})
-}
-
-// delete a task
-func DeleteTask(c *gin.Context) {
-	id := c.Param("id")
-	sqlStatement := `DELETE FROM tasks WHERE id = $1;`
-	_, err := DB.Exec(sqlStatement, id)
-	checkErr(err)
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "deleted"})
-}
-
-// error handling
-func checkErr(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
+}*/
