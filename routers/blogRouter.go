@@ -34,16 +34,6 @@ func GetTasks(c *gin.Context) {
 	var allBlog []models.Blog
 	models.DB.Find(&allBlog)
 
-	/*for out.Next() {
-		var id string
-		var task string
-		var description string
-		err = out.Scan(&task, &description, &id)
-		checkErr(err)
-
-		allTask = append(allTask, todo{ID: id, Task: task, Description: description})
-
-	}*/
 	c.IndentedJSON(http.StatusOK, gin.H{"data": allBlog})
 }
 
