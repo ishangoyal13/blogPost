@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ishangoyal13/blogPost/controllers"
+	"github.com/ishangoyal13/blogPost/middleware"
 	"github.com/ishangoyal13/blogPost/models"
 	//jwtAuth "gitlab.com/ishangoyal/goapi/services"
 )
@@ -25,6 +27,15 @@ func RegisterRoutes() *gin.Engine {
 	// router.POST("/signup", jwtAuth.SignUp)
 	router.DELETE("/blog/:id", DeleteTask)
 	//router.PUT("/task/:id", UpdateTask)
+	api := router.Group("/api")
+	{
+		api.POST("/token", controllers.GenerateToken)
+		api.POST("/user/register", controllers.RegisterUser)
+		secured := api.Group("/secured").Use(middleware.Auth())
+		{
+			secured.GET("/ping", controllers.Ping)
+		}
+	}
 
 	return router
 }

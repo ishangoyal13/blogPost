@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 
+	"github.com/gin-gonic/contrib/static"
+
 	"github.com/ishangoyal13/blogPost/models"
 	"github.com/ishangoyal13/blogPost/routers"
 )
@@ -10,6 +12,7 @@ import (
 func main() {
 	router := routers.RegisterRoutes()
 	models.ConnectDatabase()
+	router.Use(static.Serve("/", static.LocalFile("./views", true)))
 
 	fmt.Printf("\nSuccessfully connected to database :)\n\n")
 
