@@ -7,12 +7,10 @@ import (
 )
 
 type Blog struct {
-	ID        uint    `gorm:"primary key:autoIncrement" json:"id"`
-	Author    *string `json:"author"`
-	Title     *string `json:"title"`
-	Content   *string `json:"content"`
-	UserRefer int     `json:"user_id"`
-	User      User    `gorm:"foreignKey:UserRefer"`
+	ID      uint    `gorm:"primary key:autoIncrement" json:"id"`
+	Author  *string `json:"author"`
+	Title   *string `json:"title"`
+	Content *string `json:"content"`
 }
 
 var DB *gorm.DB

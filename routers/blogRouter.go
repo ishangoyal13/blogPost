@@ -7,7 +7,6 @@ import (
 	"github.com/ishangoyal13/blogPost/controllers"
 	"github.com/ishangoyal13/blogPost/middleware"
 	"github.com/ishangoyal13/blogPost/models"
-	//jwtAuth "gitlab.com/ishangoyal/goapi/services"
 )
 
 type CreateTaskInput struct {
@@ -19,6 +18,7 @@ type CreateTaskInput struct {
 
 func RegisterRoutes() *gin.Engine {
 	router := gin.Default()
+	router.Use(middleware.CORSMiddleware())
 
 	// routes
 	router.GET("/blog", GetTasks)

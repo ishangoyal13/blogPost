@@ -12,8 +12,8 @@ import (
 func main() {
 	router := routers.RegisterRoutes()
 	models.ConnectDatabase()
-	router.Use(static.Serve("/", static.LocalFile("./views", true)))
 
+	router.Use(static.Serve("/", static.LocalFile("./views/frontend/public", true)))
 	fmt.Printf("\nSuccessfully connected to database :)\n\n")
 
 	router.Run("localhost:8080")
