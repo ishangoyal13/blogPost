@@ -24,58 +24,60 @@ const CreateBlog = () => {
         }),
       }
       await fetch('http://localhost:8080/blog', requestOptions)
-      navigate("/")
+      navigate('/home')
     } catch (err) {
       console.log(err)
     }
   }
 
   return (
-    <div className="createDiv">
-      <Form>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Title</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter title"
-            value={title}
-            onChange={e => {
-              setTitle(e.target.value)
-            }}
-          />
-        </Form.Group>
+    <>
+      <div className="createDiv">
+        <Form>
+          <Form.Group className="mb-3" controlId="formBasicEmail">
+            <Form.Label>Title</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter title"
+              value={title}
+              onChange={e => {
+                setTitle(e.target.value)
+              }}
+            />
+          </Form.Group>
 
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Author</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter name of Author"
-            value={author}
-            onChange={e => {
-              setAuthor(e.target.value)
-            }}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-          <Form.Label>Content</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            value={content}
-            onChange={e => {
-              setContent(e.target.value)
-            }}
-          />
-        </Form.Group>
-        <Button
-          variant="primary"
-          type="submit"
-          onClick={e => handleUserLogin(e)}
-        >
-          Submit
-        </Button>
-      </Form>
-    </div>
+          <Form.Group className="mb-3" controlId="formBasicPassword">
+            <Form.Label>Author</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter name of Author"
+              value={author}
+              onChange={e => {
+                setAuthor(e.target.value)
+              }}
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+            <Form.Label>Content</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={content}
+              onChange={e => {
+                setContent(e.target.value)
+              }}
+            />
+          </Form.Group>
+          <Button
+            variant="primary"
+            type="submit"
+            onClick={e => handleUserLogin(e)}
+          >
+            Submit
+          </Button>
+        </Form>
+      </div>
+    </>
   )
 }
 

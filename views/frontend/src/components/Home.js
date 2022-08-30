@@ -2,49 +2,65 @@ import React, { useState } from 'react'
 import './Home.css'
 import Card from 'react-bootstrap/Card'
 import axios from 'axios'
-import {RiDeleteBinFill} from 'react-icons/ri'
+import { RiDeleteBinFill } from 'react-icons/ri'
+import Button from 'react-bootstrap/Button'
 
 const Home = () => {
-  const [data, getBlog] = useState('')
+  const [allBlogData, setAllBlogData] = useState([])
+  const [loading, setLoading] = useState(false);
 
   React.useEffect(() => {
     getAllBlogs()
-  },[])
+  }, [])
 
   const getAllBlogs = () => {
-    axios
-      .get("http://localhost:8080/blog")
-      .then((response) => {
-        const allBlog = response.data.data
-        getBlog(allBlog)
-      });
+    setLoading(true);
+    axios.get('http://localhost:8080/blog').then(response => {
+      const allBlog = response.data.data
+      console.log(response);
+      if (response.status === 200) {
+        setAllBlogData(allBlog);
+        setLoading(false);
+      }
+    })
   }
-  return (
-    <DisplayBlogs data={data} />
+
+  const deleteBlog = (id) => {
+    console.log(id);
+    axios.delete(`http://localhost:8080/blog/${id}`).then(response => {
+      console.log(response)
+    })
+  }
+
+  return (loading ? <h3 style={{ color: 'white' }}>Loading..</h3> :
+    <>
+      {allBlogData.length > 0 ?
+        <div className="homeDiv">
+          {allBlogData.map((blog) => {
+            return (
+              <Card className="HomeCard" key={blog.id}>
+                <Card.Header>
+                  Author - {blog.author}{' '}
+                  <Button
+                    variant="outline-dark"
+                    onClick={() => deleteBlog(blog.id)}
+                    style={{ float: 'right' }}
+                  >
+                    <RiDeleteBinFill />
+                  </Button>{' '}
+                </Card.Header>
+                <Card.Body>
+                  <Card.Title>Title :- {blog.title}</Card.Title>
+                  <Card.Text>{blog.content}</Card.Text>
+                </Card.Body>
+              </Card>
+            )
+          })}
+        </div>
+      : <h3 style={{textAlign:'center', color:'white'}}>No Blogs Found</h3>
+      }
+    </>
   )
 }
-
-const DisplayBlogs = (props) => {
-  const {data} = props
-  if (data.length > 0) {
-    return (
-      <div className='homeDiv'>
-        {data.map((note, index) => {
-          return <Card className='HomeCard' key={index}>
-            <Card.Header>Feature no.- {note.id} <RiDeleteBinFill /></Card.Header>
-            <Card.Body>
-              <Card.Title>Title :- {note.title}</Card.Title>
-              <Card.Text>
-                {note.content}
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        })}
-      </div>
-    )
-  } else {
-    <div>No blog</div>
-  }
-} 
 
 export default Home
