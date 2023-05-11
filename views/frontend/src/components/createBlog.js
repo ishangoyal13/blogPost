@@ -1,37 +1,40 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import './createBlog.css'
+import axios from 'axios'
+import Header from './Header'
 
 const CreateBlog = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [content, setContent] = useState('')
   const navigate = useNavigate()
+  const state = useLocation()
 
   const handleUserLogin = async (e) => {
     e.preventDefault()
-    try {
-      const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          title: title,
-          author: author,
-          content: content,
-        }),
+    axios.post("http://localhost:8000/api/blog", {
+      title: title,
+      author: author,
+      content: content,
+    }, {
+      headers: {
+        'Authorization': "Bearer " + localStorage.getItem("token")
       }
-      await fetch('http://localhost:8080/blog', requestOptions)
-      navigate('/home')
-    } catch (err) {
-      console.log(err)
-    }
+    }).then(response => {
+      if (response.status === 201) {
+        navigate('/home',{ state: {first_name : state.state.first_name } })
+      }
+    }).catch(err => {
+      console.log(err.response.data)
+    })
   }
 
   return (
     <>
+      <Header />
       <div className="createDiv">
         <Form>
           <Form.Group className="mb-3" controlId="formBasicEmail">

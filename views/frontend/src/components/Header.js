@@ -1,29 +1,27 @@
-import React, { useState } from 'react'
+import React from 'react'
 import Navbar from 'react-bootstrap/Navbar'
 import Container from 'react-bootstrap/Container'
 import Button from 'react-bootstrap/Button'
-import { FiEdit } from 'react-icons/fi'
-import {TiArrowBackOutline} from 'react-icons/ti'
-import { useNavigate } from 'react-router-dom'
+import { FiEdit,FiLogOut } from 'react-icons/fi'
+import { TiArrowBackOutline } from 'react-icons/ti'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const Header = () => {
   const navigate = useNavigate()
-  const [onEditPage, setOnEditPage] = useState(false)
-
+  const state = useLocation()
   return (
     <>
       <Navbar bg="dark" variant="dark">
         <Container>
-          <Navbar.Brand>Welcome User :)</Navbar.Brand>
+          <Navbar.Brand>Welcome {state.state.first_name} :)</Navbar.Brand>
           <Navbar.Toggle />
           <Navbar.Collapse className="justify-content-end">
             <Navbar.Text>
-              {!onEditPage ? (
+              {state.pathname !== "/addblog" ? (
                 <Button
                   variant="primary"
                   onClick={() => {
-                    setOnEditPage(true)
-                    navigate('/addblog')
+                    navigate('/addblog', { state: { first_name: state.state.first_name } })
                   }}
                 >
                   Add Blog <FiEdit />
@@ -32,13 +30,22 @@ const Header = () => {
                 <Button
                   variant="primary"
                   onClick={() => {
-                    setOnEditPage(false)
-                    navigate('/home')
+                    navigate('/home', { state: { first_name: state.state.first_name } })
                   }}
                 >
                   Go Back <TiArrowBackOutline />
                 </Button>
               )}
+            </Navbar.Text>&nbsp;
+            <Navbar.Text>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  navigate('/login')
+                }}
+              >
+                Log Out <FiLogOut />
+              </Button>
             </Navbar.Text>
           </Navbar.Collapse>
         </Container>

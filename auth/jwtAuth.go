@@ -10,43 +10,38 @@ import (
 var jwtKey = []byte("supersecretkey")
 
 type JWTClaim struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	jwt.StandardClaims
+	PhoneNumber int    `json:"phone_number"`
+	UserId      uint64 `json:"user_id"`
+	jwt.RegisteredClaims
 }
 
-func GenerateJWT(email string, username string) (tokenString string, err error) {
+func GenerateJWT(phoneNumber int, userId uint64) (tokenString string, err error) {
 	expirationTime := time.Now().Add(1 * time.Hour)
 	claims := &JWTClaim{
-		Email:    email,
-		Username: username,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expirationTime.Unix(),
+		PhoneNumber: phoneNumber,
+		UserId:      userId,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err = token.SignedString(jwtKey)
 	return
 }
-func ValidateToken(signedToken string) (err error) {
-	token, err := jwt.ParseWithClaims(
-		signedToken,
-		&JWTClaim{},
-		func(token *jwt.Token) (interface{}, error) {
-			return []byte(jwtKey), nil
-		},
-	)
+
+func ParseClaims(signedToken string) (int, uint64, error) {
+	token, err := jwt.ParseWithClaims(signedToken, &JWTClaim{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(jwtKey), nil
+	})
 	if err != nil {
-		return
+		return 0, 0, err
 	}
+
 	claims, ok := token.Claims.(*JWTClaim)
-	if !ok {
-		err = errors.New("couldn't parse claims")
-		return
-	}
-	if claims.ExpiresAt < time.Now().Local().Unix() {
+	if ok && token.Valid {
+		return claims.PhoneNumber, claims.UserId, nil
+	} else {
 		err = errors.New("token expired")
-		return
+		return 0, 0, err
 	}
-	return
 }

@@ -4,22 +4,20 @@ import Button from 'react-bootstrap/Button'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
-function Register() {
-  const [name, setName] = useState('')
+function Login() {
   const [phoneNumber, setPhoneNumber] = useState()
   const [pass, setPass] = useState('')
   const navigate = useNavigate()
 
   const handleUserLogin = async e => {
     e.preventDefault()
-    axios.post("http://localhost:8000/api/user/register", {
-      name: name,
+    axios.post("http://localhost:8000/api/user/token", {
       phone_number: parseInt(phoneNumber),
       password: pass,
     }).then(response => {
-      if (response.status === 201) {
+      if (response.status === 200) {
         localStorage.setItem("token", response.data.token)
-        navigate('/home', { state: { first_name: name } })
+        navigate('/home',{ state: { first_name: response.data.name } })
       }
     }).catch(err => {
       console.log(err.response.data)
@@ -38,19 +36,8 @@ function Register() {
   return (
     <div className="createDiv">
       <Form>
-        <Form.Group className="mb-3">
-          <Form.Label>Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter name"
-            value={name}
-            onChange={e => {
-              setName(e.target.value)
-            }}
-          />
-        </Form.Group>
 
-        <Form.Group className="mb-3" controlId="formBasicEmail">
+        <Form.Group className="mb-3" controlId="formBasicNumber">
           <Form.Label>Phone Number</Form.Label>
           <Form.Control
             type="text"
@@ -81,20 +68,16 @@ function Register() {
           </Form.Switch>
         </Form.Group>
 
-        <Form.Group className="mb-3">
-          <br/>
-          <Button
-            variant="primary"
-            type="submit"
-            onClick={e => handleUserLogin(e)}
-          >
-            Register User
-          </Button>
-          <p style={{ float: 'right' }}>Already a User ? <a href='/login' style={{}}>LogIN</a></p>
-        </Form.Group>
+        <Button
+          variant="primary"
+          type="submit"
+          onClick={e => handleUserLogin(e)}
+        >
+          Login
+        </Button>
       </Form>
     </div>
   )
 }
 
-export default Register
+export default Login
